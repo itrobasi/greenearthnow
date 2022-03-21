@@ -1,0 +1,46 @@
+// Notes:
+// Setups: Email, Slack. Install extra plugins:
+// Plugins: Accept Defaults Plugins. 
+
+pipeline {
+    agent any
+    environment{
+        githuburl = "https://github.com/itrobasi/greenearthnow.git"
+        
+    }
+    stages {
+        stage('GitHubClone') {
+            steps {
+                //Notification Step
+                //emailext body: 'Start CI | $PROJECT_NAME | COPY Project Code', subject: 'COPY Project Code', to: 'kwaze@outlook.com'
+                // Execution Step
+                git "${githuburl}"
+            }
+        }
+        stage('Copy2UserHome') {
+            steps {
+                //Notification Step
+                //emailext body: 'Success | $PROJECT_NAME | COPY Project Code', subject: 'COPY Project Code', to: 'kwaze@outlook.com'
+                // Execution Step
+                sh 'mvn test'
+                sh ""
+            }
+        }
+        stage('Push2WebServer') {
+            steps {
+                //Notification Step
+                //emailext body: 'Success | $PROJECT_NAME | RUN Unit Tests', subject: 'RUN Unit Tests', to: 'kwaze@outlook.com'
+                // Execution Step
+                sh 'mvn clean package'
+            }
+        }
+        stage('Push2S3Bucket') {
+            steps {
+                //Notification Step
+                //emailext body: 'Success | $PROJECT_NAME | RUN Build Package', subject: 'RUN Build Package', to: 'kwaze@outlook.com'
+                // Execution Step
+                sh 'mvn verify'
+            }
+        }
+    }
+}
